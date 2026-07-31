@@ -1,23 +1,42 @@
 --[[
+    $$\                  $$$$$$\                $$\                     
+    $$ |                $$  __$$\               $$ |                    
+    $$ |  $$\  $$$$$$$\ $$ /  \__|$$\   $$\     $$ |$$\   $$\  $$$$$$\
+    $$ | $$  |$$  _____|$$$$\     $$ |  $$ |    $$ |$$ |  $$ | \____$$\
+    $$$$$$  / \$$$$$$\  $$  _|    $$ |  $$ |    $$ |$$ |  $$ | $$$$$$$ |
+    $$  _$$<   \____$$\ $$ |      $$ |  $$ |    $$ |$$ |  $$ |$$  __$$ |
+    $$ | \$$\ $$$$$$$  |$$ |      \$$$$$$  |$$\ $$ |\$$$$$$  |\$$$$$$$ |
+    \__|  \__|\_______/ \__|       \______/ \__|\__| \______/  \_______|
 
-    @.__stav was here
-    do not run VapeV4ForRoblox at 3AM 😱😱
+    .__stav on discord
+    support: https://discord.gg/aeWuPMA5zX
 
-    Keep stalking my script and I will leak your webhook endpoints, that's all I've got to say :)
-]]
+    to-do:
+        fix potential aura bug?
+        add finddestinyshard to AutoShard
+
+    exec issues:
+        Nexomia: unable to start script
+        Madium: crashsploit with firetouchinterest
+
+        Externals: bad fire funcs (touchinterest, proximityprompt)
+--]]
+
+local realtime = os.clock()
 
 do
-  loadstring(game:HttpGet("https://raw.githubusercontent.com/7GrandDadPGN/VapeV4ForRoblox/main/NewMainScript.lua", true))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/7GrandDadPGN/VapeV4ForRoblox/main/NewMainScript.lua", true))()
 end
 
-repeat task.wait() until shared.vape and shared.vape.Libraries.entity ~= nil
 local cloneref = cloneref or function(obj)
     return obj
 end
 
 local replicatedStorage = cloneref(game:GetService('ReplicatedStorage'))
+local httpService = cloneref(game:GetService('HttpService'))
 local playersService = cloneref(game:GetService('Players'))
 local lplr = playersService.LocalPlayer
+repeat task.wait() until shared.vape and shared.vape.Libraries.entity ~= nil
 
 local vape = shared.vape
 local entitylib = vape.Libraries.entity
@@ -144,7 +163,7 @@ run(function()
             if callback then
                 if not fireproximityprompt then
                     notif('Vape', 'no proximity prompt func (unable to run AutoShard)', 4)
-                    AutoShard:Toggle()
+                    return AutoShard:Toggle()
                 end
 
                 repeat
@@ -178,7 +197,7 @@ run(function()
             if callback then
                 if not firetouchinterest then
                     notif('Vape', 'no firetouchinterest func (unable to go automatically to the arena)', 4)
-                    AutoArena:Toggle()
+                    return AutoArena:Toggle()
                 end
 
                 repeat
@@ -272,11 +291,12 @@ run(function()
             if callback then
                 if not firesignal or ({identifyexecutor()})[1] == 'Solara' then
                     notif('Vape', 'unable to send, limited/no firesignal func', 4)
-                    FakeText:Toggle()
+                    return FakeText:Toggle()
                 end
 
                 firesignal(replicatedStorage.MainEvents.ChatEvent.OnClientEvent, Text.Value, Color3.fromHSV(Color.Hue, Color.Sat, Color.Value), FontOption.Value.Family:match('([^/]+)%.json$'), Size.Value)
                 notif('Vape', 'sent faketext in chat (will only show on your screen)', 3)
+
                 FakeText:Toggle()
             end
         end,
@@ -301,8 +321,23 @@ run(function()
     })
 end)
 
---[[
-    to-do: add autonotif (automatically lets you know that script has updated..)
+task.spawn(function()
+    run(function()
+        if isfile and writefile and readfile then
+            local commit = httpService:JSONDecode(game:HttpGet('https://api.github.com/repos/stxxv/koolxtras/commits'))[1]
 
-    HttpService:JSONDecode(game:HttpGet('https://api.github.com/repos/stxxv/koolxtras/commits'))[1].sha
-]]
+            if not isfile('newvape/profiles/ksfucommit.txt') then
+                writefile('newvape/profiles/ksfucommit.txt', commit.sha)
+            elseif readfile('newvape/profiles/ksfucommit.txt') ~= commit.sha then
+                notif('Update detected', commit.commit.message, 12)
+                writefile('newvape/profiles/ksfucommit.txt', commit.sha)
+            end
+        end
+
+        if setclipboard then
+            setclipboard('https://discord.gg/aeWuPMA5zX')
+        end
+
+        notif('Vape', string.format('loaded successfully in: %.2fs, support server has been copied to your clipboard!', os.clock() - realtime), 6)
+    end)
+end)
